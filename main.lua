@@ -16,6 +16,7 @@ local background = { x = 0, y = 0, sprite = love.graphics.newImage('T_field2.png
 local currLane = 1
 local card = { y = lanes[1] + 20, sprite = love.graphics.newImage('cards/Hearts/Hearts_card_01.png'), width = 27, height = 34 }
 card.x = WIDTH - card.sprite:getWidth() * 2
+local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/Hearts/just_heart.png'), width = 32, height = 32 }
 
 function love.load()
     love.window.setTitle('suit ninja')
@@ -43,6 +44,12 @@ function love.keypressed(key)
     if key == 'down' then
         currLane = 2
     end
+
+    if key == 'z' then
+        projectile.x, projectile.y = player.x + projectile.width, player.y + projectile.height
+        projectile.active = true
+    end
+
     if key == 'escape' then
         love.event.quit()
     end
@@ -84,6 +91,14 @@ function love.update(dt)
         end
     end
 
+    if projectile.active then
+        projectile.x = projectile.x + projectile.speed * dt
+        if not card.dead and collision(projectile, card) then
+            card.dead = true
+            projectile.active = false
+        end
+    end
+
     player.currAnim:update(dt)
 
     Timer.update(dt)
@@ -93,6 +108,10 @@ function love.draw()
     push:start()
 
     love.graphics.draw(background.sprite, -background.x, background.y)
+
+    if projectile.active then
+        love.graphics.draw(projectile.sprite, projectile.x, projectile.y)
+    end
 
     if not card.dead then
         love.graphics.draw(card.sprite, card.x, card.y, 0, 0.8, 0.8)
