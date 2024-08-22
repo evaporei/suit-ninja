@@ -16,7 +16,7 @@ local background = { x = 0, y = 0, sprite = love.graphics.newImage('T_field2.png
 local currLane = 1
 local card = { y = lanes[1] + 20, sprite = love.graphics.newImage('cards/Hearts/Hearts_card_01.png'), width = 27, height = 34 }
 card.x = WIDTH - card.sprite:getWidth() * 2
-local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/Hearts/just_heart.png'), width = 32, height = 32 }
+local projectiles = {}
 
 function love.load()
     love.window.setTitle('suit ninja')
@@ -46,8 +46,10 @@ function love.keypressed(key)
     end
 
     if key == 'z' then
+        local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/Hearts/just_heart.png'), width = 32, height = 32 }
         projectile.x, projectile.y = player.x + projectile.width, player.y + projectile.height
         projectile.active = true
+        table.insert(projectiles, projectile)
     end
 
     if key == 'escape' then
@@ -91,11 +93,13 @@ function love.update(dt)
         end
     end
 
-    if projectile.active then
-        projectile.x = projectile.x + projectile.speed * dt
-        if not card.dead and collision(projectile, card) then
-            card.dead = true
-            projectile.active = false
+    for _, projectile in pairs(projectiles) do
+        if projectile.active then
+            projectile.x = projectile.x + projectile.speed * dt
+            if not card.dead and collision(projectile, card) then
+                card.dead = true
+                projectile.active = false
+            end
         end
     end
 
@@ -109,8 +113,10 @@ function love.draw()
 
     love.graphics.draw(background.sprite, -background.x, background.y)
 
-    if projectile.active then
-        love.graphics.draw(projectile.sprite, projectile.x, projectile.y)
+    for _, projectile in pairs(projectiles) do
+        if projectile.active then
+            love.graphics.draw(projectile.sprite, projectile.x, projectile.y)
+        end
     end
 
     if not card.dead then
