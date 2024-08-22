@@ -5,8 +5,9 @@ love.graphics.setDefaultFilter('nearest', 'nearest')
 
 WIDTH, HEIGHT = 480, 270
 
-local player = { x = 6, y = HEIGHT / 3, speed = 200 }
+local player = { x = 6, y = HEIGHT / 3 + 8, speed = 200 }
 local background = { x = 0, y = 0, sprite = love.graphics.newImage('T_field2.png'), speed = 50 }
+local lane = 1
 
 function love.load()
     love.window.setTitle('suit ninja')
@@ -27,23 +28,28 @@ function love.load()
 end
 
 function love.keypressed(key)
+    if key == 'up' then
+        lane = 1
+    end
+    if key == 'down' then
+        lane = 2
+    end
     if key == 'escape' then
         love.event.quit()
     end
 end
 
 function love.update(dt)
-    if love.keyboard.isDown('up') then
-        player.y = player.y - player.speed * dt
-    end
-    if love.keyboard.isDown('down') then
-        player.y = player.y + player.speed * dt
-    end
     if love.keyboard.isDown('left') then
         player.x = player.x - player.speed * dt
     end
     if love.keyboard.isDown('right') then
         player.x = player.x + player.speed * dt
+    end
+    if lane == 1 then
+        player.y = HEIGHT / 3 + 8
+    elseif lane == 2 then
+        player.y = HEIGHT / 3 * 2 - 2
     end
     player.currAnim:update(dt)
 
