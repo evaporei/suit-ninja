@@ -1,5 +1,6 @@
 local push = require('push')
 local anim8 = require('anim8')
+local Timer = require('timer')
 
 love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -47,14 +48,20 @@ function love.update(dt)
         player.x = player.x + player.speed * dt
     end
     if lane == 1 then
-        player.y = HEIGHT / 3 + 8
+        Timer.tween(0.1, {
+            [player] = { y = HEIGHT / 3 + 8 }
+        })
     elseif lane == 2 then
-        player.y = HEIGHT / 3 * 2 - 2
+        Timer.tween(0.1, {
+            [player] = { y = HEIGHT / 3 * 2 - 2 }
+        })
     end
     player.currAnim:update(dt)
 
     background.x = background.x + background.speed * dt
     background.x = background.x % WIDTH
+
+    Timer.update(dt)
 end
 
 function love.draw()
