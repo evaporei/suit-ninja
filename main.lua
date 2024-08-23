@@ -11,7 +11,14 @@ local lanes = {
     [2] = HEIGHT / 3 * 2 - 2,
 }
 
-local player = { x = 6, y = HEIGHT / 3 + 8, speed = 200, width = 32, height = 32 }
+local player = {
+    x = 6,
+    y = HEIGHT / 3 + 8,
+    speed = 200,
+    width = 32,
+    height = 32,
+    lives = 3,
+}
 local background = { x = 0, y = 0, sprite = love.graphics.newImage('T_field2.png'), speed = 50 }
 local currLane = 1
 local cards = {}
@@ -130,6 +137,10 @@ function love.update(dt)
 
             if collision(player, card) then
                 player.currAnim = player.animations.hurt
+                player.lives = player.lives - 1
+                if player.lives == 0 then
+                    love.event.quit()
+                end
                 Timer.after(0.2, function ()
                     player.currAnim = player.animations.run
                 end)
