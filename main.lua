@@ -56,8 +56,16 @@ function love.load()
         local suit = suits[math.random(#suits)]
         local number = math.random(13)
         local file = 'cards/' .. suit .. '/' .. lpad(tostring(number), 2, '0') .. '.png'
-        local card = { y = lanes[1] + 20, sprite = love.graphics.newImage(file), width = 27, height = 34 }
-        card.x = WIDTH + card.sprite:getWidth()
+        local sprite = love.graphics.newImage(file)
+        local card = {
+            y = lanes[1] + 20,
+            sprite = sprite,
+            width = 27,
+            height = 34,
+            x = WIDTH + sprite:getWidth(),
+            suit = suit,
+            number = number,
+        }
         table.insert(cards, card)
     end)
 end
@@ -80,7 +88,7 @@ function love.keypressed(key)
             sprite = love.graphics.newImage(file),
             width = size,
             height = size,
-            kind = projectileSuit,
+            suit = projectileSuit,
         }
         projectile.x, projectile.y = player.x + projectile.width, player.y + projectile.height
         projectile.active = true
@@ -135,8 +143,10 @@ function love.update(dt)
             projectile.x = projectile.x + projectile.speed * dt
             for _, card in pairs(cards) do
                 if not card.dead and collision(projectile, card) then
-                    card.dead = true
                     projectile.active = false
+                    if card.suit == projectile.suit .. 's' then
+                        card.dead = true
+                    end
                 end
             end
         end
