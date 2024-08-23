@@ -19,6 +19,13 @@ local projectiles = {}
 
 local suits = { 'hearts', 'diamonds', 'spades', 'clubs' }
 
+local inputToSuit = {
+    ['z'] = 'heart',
+    ['x'] = 'diamond',
+    ['m'] = 'spade',
+    ['c'] = 'club',
+}
+
 local function lpad(s, l, c)
     local res = string.rep(c or ' ', l - #s) .. s
 
@@ -63,8 +70,18 @@ function love.keypressed(key)
         currLane = 2
     end
 
-    if key == 'z' then
-        local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/suits/heart.png'), width = 32, height = 32 }
+    local projectileSuit = inputToSuit[key]
+    if projectileSuit then
+        local file = 'cards/suits/' .. projectileSuit .. '.png'
+        local size = 20
+        local projectile = {
+            active = false,
+            speed = 400,
+            sprite = love.graphics.newImage(file),
+            width = size,
+            height = size,
+            kind = projectileSuit,
+        }
         projectile.x, projectile.y = player.x + projectile.width, player.y + projectile.height
         projectile.active = true
         table.insert(projectiles, projectile)
@@ -137,7 +154,7 @@ function love.draw()
 
     for _, projectile in pairs(projectiles) do
         if projectile.active then
-            love.graphics.draw(projectile.sprite, projectile.x, projectile.y, math.rad(270), nil, nil, projectile.width / 2, projectile.height / 2)
+            love.graphics.draw(projectile.sprite, projectile.x, projectile.y, math.rad(90), nil, nil)
         end
     end
 
