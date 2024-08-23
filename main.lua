@@ -14,8 +14,7 @@ local lanes = {
 local player = { x = 6, y = HEIGHT / 3 + 8, speed = 200, width = 32, height = 32 }
 local background = { x = 0, y = 0, sprite = love.graphics.newImage('T_field2.png'), speed = 50 }
 local currLane = 1
-local card = { y = lanes[1] + 20, sprite = love.graphics.newImage('cards/Hearts/Hearts_card_01.png'), width = 27, height = 34 }
-card.x = WIDTH - card.sprite:getWidth() * 2
+local cards = {}
 local projectiles = {}
 
 function love.load()
@@ -35,6 +34,12 @@ function love.load()
         hurt = anim8.newAnimation(player.grid(6, '1-1'), 0.2),
     }
     player.currAnim = player.animations.run
+
+    Timer.every(2, function ()
+        local card = { y = lanes[1] + 20, sprite = love.graphics.newImage('cards/Hearts/Hearts_card_01.png'), width = 27, height = 34 }
+        card.x = WIDTH + card.sprite:getWidth()
+        table.insert(cards, card)
+    end)
 end
 
 function love.keypressed(key)
@@ -81,24 +86,28 @@ function love.update(dt)
     background.x = background.x + background.speed * dt
     background.x = background.x % WIDTH
 
-    if not card.dead then
-        card.x = card.x - background.speed * dt
+    for _, card in pairs(cards) do
+        if not card.dead then
+            card.x = card.x - background.speed * dt
 
-        if collision(player, card) then
-            player.currAnim = player.animations.hurt
-            Timer.after(0.2, function ()
-                player.currAnim = player.animations.run
-            end)
-            card.dead = true
+            if collision(player, card) then
+                player.currAnim = player.animations.hurt
+                Timer.after(0.2, function ()
+                    player.currAnim = player.animations.run
+                end)
+                card.dead = true
+            end
         end
     end
 
     for _, projectile in pairs(projectiles) do
         if projectile.active then
             projectile.x = projectile.x + projectile.speed * dt
-            if not card.dead and collision(projectile, card) then
-                card.dead = true
-                projectile.active = false
+            for _, card in pairs(cards) do
+                if not card.dead and collision(projectile, card) then
+                    card.dead = true
+                    projectile.active = false
+                end
             end
         end
     end
@@ -119,8 +128,10 @@ function love.draw()
         end
     end
 
-    if not card.dead then
-        love.graphics.draw(card.sprite, card.x, card.y, 0, 0.8, 0.8)
+    for _, card in pairs(cards) do
+        if not card.dead then
+            love.graphics.draw(card.sprite, card.x, card.y, 0, 0.8, 0.8)
+        end
     end
 
     local scale = 2
