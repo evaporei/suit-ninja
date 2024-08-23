@@ -115,7 +115,7 @@ function love.draw()
 
     for _, projectile in pairs(projectiles) do
         if projectile.active then
-            love.graphics.draw(projectile.sprite, projectile.x, projectile.y)
+            love.graphics.draw(projectile.sprite, projectile.x, projectile.y, math.rad(270), nil, nil, projectile.width / 2, projectile.height / 2)
         end
     end
 
