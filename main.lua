@@ -17,8 +17,18 @@ local currLane = 1
 local cards = {}
 local projectiles = {}
 
+local suits = { 'hearts', 'diamonds', 'spades', 'clubs' }
+
+local function lpad(s, l, c)
+    local res = string.rep(c or ' ', l - #s) .. s
+
+    return res, res ~= s
+end
+
 function love.load()
     love.window.setTitle('suit ninja')
+
+    math.randomseed(os.time())
 
     push:setupScreen(WIDTH, HEIGHT, 1280, 720, {
         vsync = true,
@@ -36,7 +46,10 @@ function love.load()
     player.currAnim = player.animations.run
 
     Timer.every(2, function ()
-        local card = { y = lanes[1] + 20, sprite = love.graphics.newImage('cards/Hearts/Hearts_card_01.png'), width = 27, height = 34 }
+        local suit = suits[math.random(#suits)]
+        local number = math.random(13)
+        local file = 'cards/' .. suit .. '/' .. lpad(tostring(number), 2, '0') .. '.png'
+        local card = { y = lanes[1] + 20, sprite = love.graphics.newImage(file), width = 27, height = 34 }
         card.x = WIDTH + card.sprite:getWidth()
         table.insert(cards, card)
     end)
@@ -51,7 +64,7 @@ function love.keypressed(key)
     end
 
     if key == 'z' then
-        local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/Hearts/just_heart.png'), width = 32, height = 32 }
+        local projectile = { active = false, speed = 400, sprite = love.graphics.newImage('cards/suits/heart.png'), width = 32, height = 32 }
         projectile.x, projectile.y = player.x + projectile.width, player.y + projectile.height
         projectile.active = true
         table.insert(projectiles, projectile)
